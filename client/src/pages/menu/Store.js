@@ -15,13 +15,10 @@ export const Store = () => {
 
    // 가게 정보 불러오기
    useEffect(() => {
-      axios
-         .get(`${API_BASE_URL}/member/${userId}`)
-         .then(res => {
-            const storeInfo = res.data.data;
-            dispatch(setStoreInfo(storeInfo));
-         })
-         .catch(err => console.log(err));
+      axios.get(`${API_BASE_URL}/member/${userId}`).then(res => {
+         const storeInfo = res.data.data;
+         dispatch(setStoreInfo(storeInfo));
+      });
    }, []);
    return (
       <Wrapper>
