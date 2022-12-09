@@ -1,35 +1,68 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import BellIcon from './../../assets/img/bell_icon.png';
-import { gnbToggleOpen, updateAlarmData } from '../../redux/action/action';
+import { gnbToggleOpen, setLoginStatus, updateAlarmData } from '../../redux/action/action';
 import IconClose from './../../assets/img/icon_close_white.png';
 import * as S from './Gnb.style';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import useInterval from '../../util/useInterval';
-
+import callAlramSound from '../../assets/sound/callAlram.wav';
 const Gnb = () => {
+   const bellIconRef = useRef(null);
+   const [audio] = useState(new Audio(callAlramSound));
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const dispatch = useDispatch();
    const gnbState = useSelector(store => store.gnbReducer);
-   const url = useSelector(state => state.adminReducer.apiUrl);
    const alarmData = useSelector(state => state.adminReducer.alarmData);
    const getAlarm = async url => {
-      let variable = await axios.get(url).then(res => {
-         return res.data.data
-            .slice(0)
-            .reverse()
-            .map(num => num);
-      });
+      let variable = await axios
+         .get(url, { headers: { Authorization: sessionStorage.getItem('Authorization') } })
+         .then(res => {
+            return res.data.data
+               .slice(0)
+               .reverse()
+               .map(num => num);
+         });
       return variable;
    };
+   const bellAnimation = deg => {
+      setTimeout(() => {
+         bellIconRef.current.style.transition = `0.3s`;
+         bellIconRef.current.style.transform = `translateX(0%) rotateZ(${deg}deg)`;
+      }, 300);
+   };
    const getAlarms = async () => {
-      const orderAlarmReverse = await getAlarm(`${url}/table/${sessionStorage.getItem('userId')}/order`);
-      const callAlarmReverse = await getAlarm(`${url}/call/${sessionStorage.getItem('userId')}`);
-      dispatch(updateAlarmData(callAlarmReverse, orderAlarmReverse));
+      const orderAlarmReverse = await getAlarm(`${API_BASE_URL}/table/${sessionStorage.getItem('userId')}/order`);
+      const callAlarmReverse = await getAlarm(`${API_BASE_URL}/call/${sessionStorage.getItem('userId')}`);
+      if (
+         sessionStorage.getItem('call') < callAlarmReverse.length ||
+         sessionStorage.getItem('order') < orderAlarmReverse.length
+      ) {
+         sessionStorage.setItem('call', callAlarmReverse.length);
+         sessionStorage.setItem('order', orderAlarmReverse.length);
+         audio.play();
+         bellAnimation(-20);
+         setTimeout(() => {
+            bellAnimation(20);
+         }, 300);
+         setTimeout(() => {
+            bellAnimation(0);
+         }, 600);
+      }
+      dispatch(updateAlarmData(orderAlarmReverse, callAlarmReverse));
    };
    useEffect(() => {
       getAlarms();
    }, []);
+
+   const navigate = useNavigate();
+
+   const logoutHandler = () => {
+      dispatch(setLoginStatus(false));
+      sessionStorage.clear();
+      navigate('/');
+   };
 
    useInterval(() => {
       getAlarms();
@@ -46,7 +79,7 @@ const Gnb = () => {
                   <div>
                      <S.Bell bell>
                         <span>{count}</span>
-                        <img src={BellIcon} alt="벨알람" />
+                        <img ref={bellIconRef} src={BellIcon} alt="벨알람" />
                      </S.Bell>
                      매장알람
                   </div>
@@ -82,7 +115,13 @@ const Gnb = () => {
                   테이블 목록
                </NavLink>
             </S.Li>
-            <S.MSpan>로그아웃</S.MSpan>
+            <S.Li>
+               <NavLink onClick={() => dispatch(gnbToggleOpen(false))} to="/user/store">
+                  <S.StoreImg className="storeImg" alt="plus icon" />
+                  가게 정보
+               </NavLink>
+            </S.Li>
+            <S.MSpan onClick={logoutHandler}>로그아웃</S.MSpan>
          </S.GnbList>
       </S.GnbContainer>
    );

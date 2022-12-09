@@ -16,13 +16,27 @@ import MemberInfo from './pages/Signup/MemberInfo';
 import StoreInfo from './pages/Signup/StoreInfo';
 import Complete from './pages/Signup/Complete';
 import Login from './pages/Signup/Login';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AnimatedRoutes } from './components/usermenu/AnimatedRoutes';
 import { Home } from './pages';
+import { useEffect } from 'react';
+import { setLoginStatus } from './redux/action/action';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 function App() {
    const printModalState = useSelector(state => state.adminReducer.printModal);
    const noHeader = useSelector(store => store.stateReducer.header);
+   const token = sessionStorage.getItem('access token');
+   const dispatch = useDispatch();
+
+   useEffect(() => {
+      AOS.init({ duration: 600 });
+      // 토큰이 있을시 로그인 유지
+      if (token) {
+         dispatch(setLoginStatus(true));
+      }
+   }, []);
 
    return (
       <div className="App">
@@ -40,12 +54,12 @@ function App() {
                   <Route path="/user/menusetting" element={<SetMenu />} />
                   <Route path="/user/menu" element={<Menu />} />
                </Route>
-               <Route path="/SignupTos" element={<SignupTos />} />
-               <Route path="/MemberInfo" element={<MemberInfo />} />
-               <Route path="/StoreInfo" element={<StoreInfo />} />
-               <Route path="/Complete" element={<Complete />} />
-               <Route path="/Login" element={<Login />} />
-               {/* <Route path="/usermenu/*" element={<MenuApp />} /> */}
+               <Route path="/signup" element={<SignupTos />} />
+               <Route path="/signup/1" element={<MemberInfo />} />
+               <Route path="/signup/2" element={<StoreInfo />} />
+               <Route path="/signup/complete" element={<Complete />} />
+               <Route path="/login" element={<Login />} />
+
                <Route path="/usermenu/*" element={<AnimatedRoutes />} />
             </Routes>
          </BrowserRouter>

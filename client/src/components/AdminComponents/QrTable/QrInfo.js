@@ -1,26 +1,30 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { savedTableListCheckBoxArr, registUpdateTableNumber } from '../../../redux/action/action';
-const QrInfo = ({ data, idx }) => {
+
+const QrInfo = ({ data, idx, length, allChackBoxRef }) => {
    const modifyingSavedTableNumState = useSelector(state => state.adminReducer.modifyingSavedTableNum);
    const savedTableListCheckBoxArrState = useSelector(state => state.adminReducer.savedTableListCheckBoxArr);
+
+   const [isChecked, setIsChecked] = useState(false);
    const isIncludes = savedTableListCheckBoxArrState.includes(idx);
    const dispatch = useDispatch();
    const handleClickCheckBox = idx => {
+      setIsChecked(!isChecked);
       dispatch(savedTableListCheckBoxArr(idx));
    };
-
-   const qrListAllCheckState = useSelector(state => state.adminReducer.qrListAllCheck);
    const checkBoxRef = useRef(null);
    const inputRef = useRef(null);
+
    useEffect(() => {
-      if (qrListAllCheckState) {
-         checkBoxRef.current.checked = true;
+      if (length === savedTableListCheckBoxArrState.length) {
+         allChackBoxRef.current.checked = true;
       } else {
-         checkBoxRef.current.checked = false;
+         allChackBoxRef.current.checked = false;
       }
-   }, [qrListAllCheckState]);
+   }, [isChecked]);
+
    const handleChangeInput = e => {
       if (isNaN(e.target.value)) {
          alert('숫자를 입력해주세요.');
@@ -29,13 +33,25 @@ const QrInfo = ({ data, idx }) => {
          dispatch(registUpdateTableNumber(idx, e.target.value));
       }
    };
+   const onChangeCheck = () => {
+      setIsChecked(isIncludes);
+   };
    return (
       <QrInfoBox isIncludes={isIncludes}>
          <div className="qrInfos">
             <div>
-               <input ref={checkBoxRef} onClick={() => handleClickCheckBox(idx)} type="checkbox"></input>
+               <input
+                  className="hidden-input"
+                  id={`check-input${idx}`}
+                  disabled={modifyingSavedTableNumState ? true : false}
+                  ref={checkBoxRef}
+                  checked={isIncludes}
+                  onChange={onChangeCheck}
+                  onClick={() => handleClickCheckBox(idx)}
+                  type="checkbox"></input>
+               <label htmlFor={`check-input${idx}`}> </label>
             </div>
-            <div>{idx + 1}</div>
+            <div className="number">{idx + 1}</div>
             <div className="tableNumBox">
                <div className={modifyingSavedTableNumState && isIncludes ? 'displayNone' : 'none'}>
                   {data.tableNumber}
@@ -43,11 +59,10 @@ const QrInfo = ({ data, idx }) => {
                <input
                   ref={inputRef}
                   onChange={handleChangeInput}
-                  defaultValue={data.tableNumber}
                   className={modifyingSavedTableNumState && isIncludes ? 'tableNuminput' : 'displayNone'}
                   type="text"></input>
             </div>
-            <div>{data.createdAt}</div>
+            <div className="created-date">{data.createdAt}</div>
             <div></div>
          </div>
       </QrInfoBox>
@@ -55,7 +70,38 @@ const QrInfo = ({ data, idx }) => {
 };
 const QrInfoBox = styled.div`
    height: 50px;
-   border: ${({ isIncludes }) => (isIncludes ? '1px solid #313e46;' : 'none')};
+   background-color: ${({ isIncludes }) => (isIncludes ? '#FFEBDD' : 'white')};
+   border-bottom: 1px solid #ffebdd;
+   .number,
+   .tableNumBox,
+   .created-date {
+      font-size: 16px;
+   }
+   .hidden-input {
+      display: none;
+   }
+   input:checked + label::after {
+      content: '✔';
+      font-size: 12px;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: #838f94;
+      color: white;
+   }
+   label {
+      width: 17px;
+      height: 16px;
+      border-radius: 2px;
+      border: 1px solid gray;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+   }
    .tableNuminput {
       border: 0;
       height: 30px;

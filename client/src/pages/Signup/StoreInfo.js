@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MenuImg from '../../components/Menu/MenuImg';
 import Postcode from '../../components/PostCode/Postcode';
-import { ImagePreview, RealUpload, Upload } from './StoreInfo.Style';
+import ImageNotes from './../../assets/images/notes.png';
+
 import {
    Wrapper,
    Container,
@@ -16,65 +17,129 @@ import {
    PanelTitle,
    Btn
 } from './SignupTos.Style';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { InfoForm, CompanyNum, FormControl } from './MemberInfo.Style';
-//가게 사진, 가게 설명, 주소, 전화번호, 영업시간
-// 주소, 바디, 헤더
+import { onChangeIdAction, onChangePasswordAction, onChangeBusinessNumberAction } from '../../redux/action/action';
+
 const StoreInfo = () => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
+
+   const dispatch = useDispatch();
+   const navigate = useNavigate();
    const inputValue = useSelector(state => state);
 
-   const postStoreInfo = async () => {
-      const test = {
-         loginId: inputValue.userMemberReducer.id,
-         password: inputValue.userMemberReducer.password,
-         businessNumber: inputValue.userMemberReducer.businessNumber,
-         // img: img,
-         businessName: businessName,
-         about: about,
-         address: address,
-         contactNumber: contactNumber,
-         businessHours: businessHours
-      };
+   const [img, setImg] = useState('');
+   const [businessName, setBusinessName] = useState('');
+   const [about, setAbout] = useState();
+   const [address, setAddress] = useState('');
+   const [detailAddress, setDetailAddress] = useState('');
 
-      console.log(test);
+   const [contactNumber, setContactNumber] = useState('');
+   const [businessHours, setBusinessHours] = useState();
+   const [NumberError, setNumberError] = React.useState(false);
+
+   const [isCheck, setIsCheck] = useState({
+      businessNameError: false,
+      address: false,
+      detailAddress: false,
+      contactNumber: false
+   });
+
+   useEffect(() => {
+      if (inputValue.userMemberReducer.id === '' && inputValue.userMemberReducer.password === '') {
+         alert('잘못된 접근입니다.');
+         navigate('/signup', { replace: true });
+         return;
+      }
+   }, []);
+
+   const linkError = !(
+      businessName === '' ||
+      address === '' ||
+      detailAddress === '' ||
+      contactNumber === '' ||
+      !/^\d{2,3}-\d{4}-\d{4}$/.test(contactNumber)
+   );
+
+   const postStoreInfo = async () => {
       try {
-         const res = await axios.post(`/member`, {
+         onCheckValues();
+         valiation();
+
+         if (!linkError) {
+            return;
+         }
+
+         await axios.post(`${API_BASE_URL}/member`, {
             loginId: inputValue.userMemberReducer.id,
             password: inputValue.userMemberReducer.password,
             businessNumber: inputValue.userMemberReducer.businessNumber,
-            // img: img,
+            userImage: img,
             businessName: businessName,
             about: about,
             address: address,
             contactNumber: contactNumber,
             businessHours: businessHours
          });
-         console.log(res);
+
+         navigate('/signup/complete');
+
+         dispatch(onChangeIdAction(''));
+         dispatch(onChangePasswordAction(''));
+         dispatch(onChangeBusinessNumberAction(''));
       } catch (err) {
-         console.log(err);
+         err;
       }
    };
 
-   // eslint-disable-next-line no-unused-vars
-   const [img, setImg] = useState();
-   const [businessName, setBusinessName] = useState('');
-   const [about, setAbout] = useState();
-   const [address, setAddress] = useState();
-   const [contactNumber, setContactNumber] = useState();
-   const [businessHours, setBusinessHours] = useState();
-   const [NumberError, setNumberError] = React.useState(false);
-
    const handleNumber = e => {
       setContactNumber(e.target.value);
+      setIsCheck({ ...isCheck, contactNumber: false });
+      const ContactNumberRegex = /[0-9]{10,11}$/;
 
-      console.log(contactNumber);
-
-      const ContactNumberRegex = /[0-9]$/;
-
-      if (ContactNumberRegex.test(e.target.value) || e.target.value === '') {
+      if (!ContactNumberRegex.test(e.target.value) || e.target.value === '') {
          setNumberError(false);
       } else {
          setNumberError(true);
+      }
+   };
+
+   const onCheckValues = () => {
+      if (businessName === '' || address === '' || detailAddress === '' || contactNumber === '') {
+         setIsCheck({
+            ...isCheck,
+            businessNameError: businessName === '' ? true : false,
+            address: address === '' ? true : false,
+            detailAddress: detailAddress === '' ? true : false,
+            contactNumber: contactNumber === '' ? true : false
+         });
+      }
+   };
+
+   const valiation = () => {
+      if (businessName === '') {
+         alert('상호명을 입력해주세요.');
+         return;
+      }
+
+      if (address === '') {
+         alert('도로명 주소를 입력해주세요.');
+         return;
+      }
+
+      if (detailAddress === '') {
+         alert('가게 상세주소를 입력해주세요.');
+         return;
+      }
+
+      if (contactNumber === '') {
+         alert('가게 전화번호를 입력해주세요.');
+         return;
+      }
+
+      if (!/^\d{2,3}-\d{4}-\d{4}$/.test(contactNumber)) {
+         alert('올바른 가게 전화번호를 입력해주세요.');
+         return;
       }
    };
 
@@ -83,7 +148,7 @@ const StoreInfo = () => {
          <Container>
             <MemberReg>
                <PageTitle>
-                  <img src="images/notes.png" alt="img" />
+                  <img src={ImageNotes} alt="img" />
                   <h4>회원가입</h4>
                </PageTitle>
                <DivideLine>
@@ -94,26 +159,23 @@ const StoreInfo = () => {
 
                <MemberPanel>
                   <PanelTitle>
-                     <h5>
-                        3. 가게 정보 입력
-                        <span>* 고객에게 보여지는 페이지로 신중하게 입력해주세요.</span>
-                     </h5>
+                     <h5>3. 가게 정보 입력</h5>
+                     <span style={{ float: 'left' }}>* 고객에게 보여지는 페이지로 신중하게 입력해주세요.</span>
                   </PanelTitle>
                   <InfoForm>
                      <p>프로필 사진 등록</p>
                   </InfoForm>
-                  <RealUpload type="file" accept="image/*" required multiple onChange={setImg} />
-                  <MenuImg>
-                     <Upload />
-                     <ImagePreview />
-                  </MenuImg>
+                  <MenuImg type="file" accept="image/*" required multiple setImg={setImg} />
 
-                  <InfoForm>
+                  <InfoForm buttonError={isCheck.businessNameError} passwordError={businessName === '' ? true : false}>
                      <p>상호명 *</p>
                      <FormControl
                         type="text"
                         placeholder="상호명을 입력해주세요"
-                        onChange={e => setBusinessName(e.target.value)}
+                        onChange={e => {
+                           setBusinessName(e.target.value);
+                           setIsCheck({ ...isCheck, businessNameError: false });
+                        }}
                      />
                   </InfoForm>
 
@@ -126,17 +188,38 @@ const StoreInfo = () => {
                      />
                   </InfoForm>
 
-                  <InfoForm>
+                  <InfoForm buttonError={isCheck.address} passwordError={address === '' ? true : false}>
                      <p>가게주소 *</p>
                      <CompanyNum>
                         <Postcode setAddress={setAddress} />
-                        <FormControl value={address} type="text" placeholder="도로명 주소 검색" />
+                        <FormControl
+                           disabled
+                           name="address"
+                           type="text"
+                           placeholder="도로명 주소 검색"
+                           value={address}
+                           onChange={e => {
+                              setAddress(e.target.value);
+                              setIsCheck({ ...isCheck, address: false });
+                           }}
+                        />
                      </CompanyNum>
-
-                     <FormControl type="text" placeholder="상세 주소를 입력해주세요" />
                   </InfoForm>
 
-                  <InfoForm>
+                  <InfoForm buttonError={isCheck.detailAddress} passwordError={detailAddress === '' ? true : false}>
+                     <FormControl
+                        name="detailAddress"
+                        type="text"
+                        placeholder="상세 주소를 입력해주세요"
+                        value={detailAddress}
+                        onChange={e => {
+                           setDetailAddress(e.target.value);
+                           setIsCheck({ ...isCheck, detailAddress: false });
+                        }}
+                     />
+                  </InfoForm>
+
+                  <InfoForm buttonError={isCheck.contactNumber} passwordError={contactNumber === '' ? true : false}>
                      <p>가게 전화번호 *</p>
                      <FormControl
                         maxLength={13}
@@ -147,7 +230,7 @@ const StoreInfo = () => {
                         onInput={e => {
                            e.target.value = e.target.value
                               .replace(/[^0-9]/g, '')
-                              .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+                              .replace(/^(\d{2,3})(\d{4})(\d{4})$/, `$1-$2-$3`);
                         }}
                      />
                   </InfoForm>
@@ -161,8 +244,11 @@ const StoreInfo = () => {
                      />
                   </InfoForm>
 
-                  <Btn>
-                     <Link to="/complete" onClick={postStoreInfo}>
+                  <Btn
+                     allChecked={
+                        !(businessName === '' || address === '' || detailAddress === '' || contactNumber === '')
+                     }>
+                     <Link to={null} onClick={postStoreInfo}>
                         완료
                      </Link>
                   </Btn>

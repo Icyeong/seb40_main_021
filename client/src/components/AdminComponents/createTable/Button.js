@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { createQr } from '../../../redux/action/action';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 const Btn = styled.button`
    width: 120px;
    height: 47px;
@@ -18,8 +19,8 @@ const Btn = styled.button`
 `;
 
 const ButtonWrap = ({ text, num }) => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const navigate = useNavigate();
-   const url = useSelector(state => state.adminReducer.apiUrl);
    const setOverlapNumState = useSelector(state => state.adminReducer.tableNumInputValueOverlap);
    const setSavedTebleNum = useSelector(state => state.adminReducer.setSavedTebleNum);
    const qrData = useSelector(state => state.adminReducer.qrDate);
@@ -37,29 +38,44 @@ const ButtonWrap = ({ text, num }) => {
       }
       dispatch(createQr(QrList));
    };
+
    const handleClickSaveQr = () => {
       //서버에 post 요청
-
+      for (let i = 0; i < qrData.length; i++) {
+         if (!qrData[i].tableNumber) {
+            alert('테이블 번호를 전부 입력해주세요');
+            return;
+         }
+      }
       if (!setOverlapNumState && !setSavedTebleNum) {
-         alert('테이블 등록');
          const body = { tableList: qrData };
-         console.log(body);
-         fetch(`${url}/table/${sessionStorage.getItem('userId')}`, {
+         fetch(`${API_BASE_URL}/table/${sessionStorage.getItem('userId')}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: sessionStorage.getItem('Authorization')
+            },
+
             body: JSON.stringify(body)
          })
-            .then(() => {
-               navigate('/user/qr');
+            .then(res => {
+               if (res.status === 201) {
+                  alert('테이블 등록');
+                  navigate('/user/qr');
+               } else {
+                  alert('통신 에러');
+               }
             })
-            .catch(err => console.log(err));
+            .catch(err => err);
       } else {
          //데이터 패치
 
          alert('중복된 테이블 번호가 입력되었습니다.');
       }
    };
-
+   useEffect(() => {
+      dispatch(createQr([]));
+   }, []);
    return <Btn onClick={text === 'QR 등록' ? hadleClickCreateQR : handleClickSaveQr}>{text}</Btn>;
 };
 

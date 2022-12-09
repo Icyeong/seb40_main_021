@@ -2,26 +2,46 @@ import { useEffect, useState } from 'react';
 import TableStatus from './TableStatus';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import useInterval from '../../../util/useInterval';
+
 const TableList = () => {
-   const url = useSelector(state => state.adminReducer.apiUrl);
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const [orderData, setOrderData] = useState([]);
+   const [orderDataUpdate, setOrderDataUpdate] = useState(false);
    useEffect(() => {
-      axios.get(`${url}/table/${sessionStorage.getItem('userId')}`).then(res => {
-         setOrderData(res.data.data);
-      });
-   }, []);
+      axios
+         .get(`${API_BASE_URL}/table/${sessionStorage.getItem('userId')}`, {
+            headers: { Authorization: sessionStorage.getItem('Authorization') }
+         })
+         .then(res => {
+            setOrderData(res.data.data);
+         });
+   }, [orderDataUpdate]);
+   useInterval(() => {
+      axios
+         .get(`${API_BASE_URL}/table/${sessionStorage.getItem('userId')}`, {
+            headers: { Authorization: sessionStorage.getItem('Authorization') }
+         })
+         .then(res => {
+            setOrderData(res.data.data);
+         });
+   }, 3000);
    return (
       <Content>
-         <div className="title">
-            <h1>테이블 목록</h1>
-         </div>
+         <h1 className="title">테이블 현황</h1>
+
          <div className="table">
             {orderData.length === 0 ? (
                <div className="orderEmpty">주문 내역이 없습니다.</div>
             ) : (
                orderData.map(order => {
-                  return <TableStatus key={order.tableNumber} data={order}></TableStatus>;
+                  return (
+                     <TableStatus
+                        key={order.tableNumber}
+                        data={order}
+                        orderDataUpdate={orderDataUpdate}
+                        setOrderDataUpdate={setOrderDataUpdate}></TableStatus>
+                  );
                })
             )}
          </div>
@@ -30,8 +50,8 @@ const TableList = () => {
 };
 
 const Content = styled.div`
-   min-height: calc(100vh - 50px);
    width: calc(100% - 250px);
+   height: 100%;
    margin-left: 250px;
    padding: 30px 50px;
    /* overflow: scroll; */
@@ -45,12 +65,13 @@ const Content = styled.div`
    }
    .title {
       font-size: 20px;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 30px;
+      font-weight: bold;
+      margin-bottom: 80px;
    }
    .table {
       display: grid;
+
+      height: 100%;
       width: 100%;
       grid-template-columns: repeat(5, 1fr);
       align-items: center;
@@ -67,19 +88,16 @@ const Content = styled.div`
          grid-template-columns: repeat(2, 1fr);
       }
       @media screen and (max-width: 900px) {
+         margin: 0;
          grid-template-columns: 1fr;
          grid-template-rows: 1fr;
-         flex-grow: 1;
-      }
-      @media screen and (max-width: 700px) {
-         grid-template-columns: repeat(2, 1fr);
          flex-grow: 1;
       }
       @media screen and (max-width: 500px) {
          grid-template-columns: 1fr;
       }
    }
-   @media screen and (max-width: 700px) {
+   @media screen and (max-width: 900px) {
       width: 100%;
       margin-left: 0;
       padding: 30px;

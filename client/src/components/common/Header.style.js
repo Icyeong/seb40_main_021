@@ -13,6 +13,9 @@ export const HeaderWrap = styled.header`
    align-items: center;
    background-color: white;
    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.15);
+   .logo img {
+      height: 30px;
+   }
 
    @media screen and (max-width: 900px) {
       /* justify-content: flex-start; */
@@ -21,6 +24,9 @@ export const HeaderWrap = styled.header`
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
       .logo {
          display: none;
+      }
+      .logo.main {
+         display: block;
       }
    }
 `;
@@ -43,7 +49,14 @@ export const LogoImg = styled.img`
    width: auto;
    height: 50px;
    @media screen and (max-width: 900px) {
-      display: none;
+      display: block;
+   }
+`;
+export const MainLogoImg = styled.img`
+   width: auto;
+   height: 50px;
+   @media screen and (max-width: 900px) {
+      display: block;
    }
 `;
 export const IconBtn = styled.button`
@@ -85,11 +98,12 @@ export const MListIcon = styled.img`
    height: 23px;
 `;
 export const Button = styled.button`
+   display: flex;
    & a {
       height: 33px;
       border-radius: 20px;
       background-color: #ff6b00;
-      color: white;
+      color: white !important;
       padding: 6px 12px;
       cursor: pointer;
       border: none;
@@ -124,9 +138,6 @@ export const LineBtn = styled.button`
    padding: 0;
    background-color: transparent;
    border: none;
-   & :hover {
-      background-color: #ffebdd;
-   }
 `;
 export const LineBtnUser = styled.button`
    & a {
@@ -171,8 +182,8 @@ export const LineBtnUser = styled.button`
       }
    }
 `;
-export const LineBtnUserNoUnder = styled.button`
-   & a {
+export const LineBtnUserNoUnder = styled.div`
+   & button {
       text-decoration: none;
       height: 33px;
       border-radius: 20px;

@@ -1,18 +1,10 @@
-import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Callalram from './CallAlarm';
-import callAlramSound from '../../../assets/sound/callAlram.wav';
 
 const CallAlarms = () => {
-   const [audio] = useState(new Audio(callAlramSound));
    const callAlarmList = useSelector(state => state.adminReducer.alarmData.callAlarmReverse);
    sessionStorage.setItem('call', callAlarmList.length);
-   useEffect(() => {
-      if (sessionStorage.getItem('call') < callAlarmList.length) {
-         audio.play();
-      }
-   }, []);
    return (
       <CallAlarmContainer>
          <div className="subTitle">
@@ -50,15 +42,16 @@ const CallAlarmContainer = styled.div`
       display: flex;
       overflow-x: scroll;
       align-items: center;
+      &::-webkit-scrollbar {
+         width: 10px;
+         background: rgba(0, 0, 0, 0);
+      }
+      &::-webkit-scrollbar-thumb {
+         background: rgba(0, 0, 0, 0.3);
+         border-radius: 30px;
+      }
    }
-   .callAlarms::-webkit-scrollbar {
-      height: 10px;
-      background: rgba(0, 0, 0, 0);
-   }
-   .callAlarms::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 30px;
-   }
+
    .subTitle {
       display: flex;
       flex-direction: column;

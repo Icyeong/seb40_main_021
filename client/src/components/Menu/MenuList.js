@@ -2,7 +2,7 @@ import * as S from './MenuList.style';
 import Input from '../Input';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { menuUserUpdate, menuUserDelete, menuUserErrorMessage } from '../../redux/action/action';
+import { menuUserUpdate, menuUserDelete, menuUserErrorMessage, setMenuUpdate } from '../../redux/action/action';
 import styled from 'styled-components';
 import IconPhoto from './../../assets/img/icon_menu_photo.png';
 
@@ -53,35 +53,34 @@ const LabelPhoto = styled.label`
 const MenuList = ({ el, submit, setSubmit }) => {
    const dispatch = useDispatch();
 
-   const [imgSrc, setImageSrc] = useState('');
-   const [menuNameChange, setmenuNameChange] = useState('');
-   const [menuAboutChange, setmenuAboutChange] = useState('');
-   const [pricesChange, setpricesChange] = useState('');
+   const [imgSrc, setImageSrc] = useState(el.menuImage);
+   const [menuNameChange, setmenuNameChange] = useState(el.menuName);
+   const [menuAboutChange, setmenuAboutChange] = useState(el.menuContent);
+   const [pricesChange, setpricesChange] = useState(el.price);
    const [checkedChange, setcheckedChange] = useState(false);
 
    const encodeFileToBase64 = fileBlob => {
       const reader = new FileReader();
-      reader.readAsDataURL(fileBlob);
-      return new Promise(resolve => {
-         reader.onload = () => {
-            setImageSrc(reader.result);
-            resolve();
-         };
-      });
+      const maxSize = 40000;
+      if (fileBlob.size > maxSize) {
+         alert('이미지 용량은 40KB까지로 제한됩니다.');
+      } else {
+         reader.readAsDataURL(fileBlob);
+         return new Promise(resolve => {
+            reader.onload = () => {
+               setImageSrc(reader.result);
+               resolve();
+            };
+         });
+      }
    };
 
    const [, setIsError] = useState(true);
    const [helperText, setHelperText] = useState({});
-   //get menu
-   useEffect(() => {
-      setmenuNameChange(el.menuName);
-      setpricesChange(el.price);
-      setmenuAboutChange(el.menuContent);
-      setcheckedChange(el.recommendedMenu);
-   }, [el]);
 
    //유효성
    const handleValue = e => {
+      dispatch(setMenuUpdate(true));
       if (e.target.name === 'menuName') {
          const maxValue = 21;
          if (maxValue && maxValue < e.target.value.length) return;
@@ -132,15 +131,18 @@ const MenuList = ({ el, submit, setSubmit }) => {
    }, [pricesChange]);
 
    useEffect(() => {
-      dispatch(menuUserUpdate(el.menuId, menuAboutChange, menuNameChange, imgSrc, pricesChange, checkedChange));
+      dispatch(menuUserUpdate(el.uuid, menuAboutChange, menuNameChange, imgSrc, pricesChange, checkedChange));
    }, [menuNameChange, menuAboutChange, pricesChange, imgSrc, checkedChange]);
 
    useEffect(() => {
-      dispatch(menuUserErrorMessage(el.menuId, helperText));
+      dispatch(menuUserErrorMessage(el.uuid, helperText));
    }, [helperText]);
 
    const DeleteMenu = () => {
-      dispatch(menuUserDelete(el.menuId));
+      if (confirm('메뉴를 삭제하시겠습니까?')) {
+         dispatch(setMenuUpdate(true));
+         dispatch(menuUserDelete(el.uuid));
+      }
    };
 
    //number , 쉼표처리
@@ -149,8 +151,8 @@ const MenuList = ({ el, submit, setSubmit }) => {
    //     number = number.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
    //     // setpricesChange(String(pricesChange).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
    // }, [pricesChange])
-
-   // let number = pricesChange.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g);
+   // .toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g);
+   let number = pricesChange.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
    // let number = pricesChange.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
 
    let menuNameError, pricesError, menuAboutError;
@@ -176,14 +178,14 @@ const MenuList = ({ el, submit, setSubmit }) => {
                   background={imgSrc}
                   name={'menuImg'}
                   onChange={e => handleValue(e)}
-                  htmlFor={`picture${el.menuId}`}>
+                  htmlFor={`picture${el.uuid}`}>
                   <img src={IconPhoto} alt="add" />
                </LabelPhoto>
                <input
                   onChange={e => encodeFileToBase64(e.target.files[0])}
                   type="file"
-                  name={`picture${el.menuId}`}
-                  id={`picture${el.menuId}`}
+                  name={`picture${el.uuid}`}
+                  id={`picture${el.uuid}`}
                />
             </PicWrap>
             <S.InputWrap>
@@ -199,7 +201,7 @@ const MenuList = ({ el, submit, setSubmit }) => {
                         name={`menuName`}
                         placeholder="메뉴 이름을 입력해주세요"
                         type="text"
-                        idx={el.menuId}
+                        idx={el.uuid}
                         handleValue={handleValue}
                         width={'100%'}
                         placeholders="설명을 입력해주세요"
@@ -213,7 +215,7 @@ const MenuList = ({ el, submit, setSubmit }) => {
                      <Input
                         name={`prices`}
                         active={pricesError}
-                        // value={number || ''}
+                        value={number || ''}
                         placeholder="가격(숫자)을 입력해주세요"
                         type="text"
                         pattern="[0-9]*"
@@ -249,10 +251,10 @@ const MenuList = ({ el, submit, setSubmit }) => {
                   onChange={e => handleValue(e)}
                   name="recommnd"
                   type="checkbox"
-                  id={`recommnd${el.menuId}`}
+                  id={`recommnd${el.uuid}`}
                   checked={checkedChange || false}
                />
-               <S.LabelBox htmlFor={`recommnd${el.menuId}`}>
+               <S.LabelBox htmlFor={`recommnd${el.uuid}`}>
                   추천메뉴 설정 <span>* 설정시 추천메뉴 표기가 활성화 됩니다.</span>
                </S.LabelBox>
             </S.CheckboxWrap>

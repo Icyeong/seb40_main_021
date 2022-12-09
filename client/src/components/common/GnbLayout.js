@@ -1,6 +1,8 @@
+import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Gnb from './Gnb';
+import HeaderUser from './HeaderUser';
 
 const Container = styled.div`
    width: 100%;
@@ -14,8 +16,12 @@ const Container = styled.div`
 `;
 
 const GnbLayout = () => {
+   const printModalState = useSelector(state => state.adminReducer.printModal);
+   const noHeader = useSelector(store => store.stateReducer.header);
    return (
       <Container>
+         {printModalState || noHeader ? null : <HeaderUser />}
+
          <Gnb />
          <Outlet />
       </Container>

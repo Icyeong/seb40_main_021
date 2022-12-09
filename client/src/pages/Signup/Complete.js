@@ -9,6 +9,7 @@ import {
    CompleteTxt,
    Container
 } from './Complete.Style';
+import ImageComplete from './../../assets/images/complete.png';
 
 const Complete = () => {
    return (
@@ -16,7 +17,7 @@ const Complete = () => {
          <Container>
             <CompletePanel>
                <CompleteImg>
-                  <img src="images/complete.png" alt="img" />
+                  <img src={ImageComplete} alt="img" />
                </CompleteImg>
                <CompleteTxt>
                   <h4>가입을 환영합니다.</h4>
@@ -27,7 +28,9 @@ const Complete = () => {
                   </h5>
                </CompleteTxt>
                <CompleteBtn>
-                  <BtnDefaultActive>둘러보기</BtnDefaultActive>
+                  <BtnDefaultActive>
+                     <Link to="/">둘러보기</Link>
+                  </BtnDefaultActive>
                   <BtnFill>
                      <Link to="/login">로그인</Link>
                   </BtnFill>

@@ -1,17 +1,10 @@
-import { useEffect, useState } from 'react';
 import OrderAlram from './OrderAlram';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
-import callAlramSound from '../../../assets/sound/callAlram.wav';
+
 const OrderAlarms = () => {
-   const [audio] = useState(new Audio(callAlramSound));
    const orderAlarmList = useSelector(state => state.adminReducer.alarmData.orderAlarmReverse);
    sessionStorage.setItem('order', orderAlarmList.length);
-   useEffect(() => {
-      if (sessionStorage.getItem('order') < orderAlarmList.length) {
-         audio.play();
-      }
-   }, []);
    return (
       <MainContents>
          <div className="subTitle">주문 알람</div>
@@ -21,7 +14,6 @@ const OrderAlarms = () => {
                   <div className="orderEmpty">주문 알람이 없습니다.</div>
                ) : (
                   orderAlarmList.map((menu, idx) => {
-                     console.log(menu);
                      return <OrderAlram key={menu.orderId} menu={menu} idx={idx}></OrderAlram>;
                   })
                )}
@@ -48,11 +40,13 @@ const MainContents = styled.main`
       padding: 10px;
       border-radius: 5px;
       overflow-y: scroll;
-      ::-webkit-scrollbar {
-         width: 8px;
+      &::-webkit-scrollbar {
+         width: 10px;
+         background: rgba(0, 0, 0, 0);
       }
-      ::-webkit-scrollbar-thumb {
-         background: #a9a9a9;
+      &::-webkit-scrollbar-thumb {
+         background: rgba(0, 0, 0, 0.3);
+         border-radius: 30px;
       }
    }
    .subTitle {

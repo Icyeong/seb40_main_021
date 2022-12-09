@@ -1,29 +1,29 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUtensils, faBell, faStore, faCartShopping } from '@fortawesome/free-solid-svg-icons';
-import { NavLink } from 'react-router-dom';
 import { BottomNavStyle } from '../../style/menu.style';
 
-export const BottomNavPreview = () => {
+export const BottomNavPreview = ({ now }) => {
    return (
       <BottomNavStyle>
-         <NavLink className={'active button'}>
+         <a className={now === 'menu' ? 'active button' : 'button preview'}>
             <FontAwesomeIcon icon={faUtensils} />
             <p>메뉴</p>
-         </NavLink>
+         </a>
 
-         <button>
+         <button className="preview">
             <FontAwesomeIcon icon={faBell} />
             <p>호출</p>
          </button>
-         <NavLink className="button">
+         <a className={now !== 'menu' ? 'active button' : 'button preview'}>
             <FontAwesomeIcon icon={faStore} />
             <p>가게정보</p>
-         </NavLink>
+         </a>
 
-         <NavLink className="button">
+         <a className="button preview">
             <FontAwesomeIcon icon={faCartShopping} />
             <p>주문목록</p>
-         </NavLink>
+         </a>
       </BottomNavStyle>
    );
 };

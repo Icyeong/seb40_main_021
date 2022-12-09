@@ -6,7 +6,7 @@ export const Wrapper = styled.div`
    flex-direction: column;
    align-items: center;
    justify-content: center;
-   background-color: #ebebeb;
+   /* background-color: #ebebeb; */
 
    /* box-shadow: 2px 0px 7px 3px rgb(0 0 0 / 25%); */
    main {
@@ -23,12 +23,14 @@ export const Wrapper = styled.div`
          position: fixed;
          top: 50px;
          left: 50%;
+         z-index: 10;
          transform: translate(-50%);
          display: flex;
          padding: 0 0 0 65px;
-
-         /* box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15); */
-
+         .preview {
+            height: 500px;
+            overflow-y: scroll;
+         }
          ul {
             width: 100%;
             max-width: 500px;
@@ -42,6 +44,9 @@ export const Wrapper = styled.div`
             -webkit-overflow-scrolling: touch;
             &::-webkit-scrollbar {
                display: none;
+            }
+            &.scrolling {
+               box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.1);
             }
          }
          li {
@@ -69,7 +74,7 @@ export const Wrapper = styled.div`
          top: 2.5px;
          left: 20px;
          display: flex;
-         padding: 2.5px 20px;
+         padding: 2.5px 20px 5px 0;
          transition: 0.6s;
          z-index: 1;
 
@@ -78,7 +83,7 @@ export const Wrapper = styled.div`
             height: 40px;
             border-radius: 30px;
             border: none;
-            /* box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.18); */
+            box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.18);
             text-align: center;
             padding: 0 10px;
             position: absolute;
@@ -125,13 +130,16 @@ export const Wrapper = styled.div`
             box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.2);
          }
       }
+      .menulist-wrapper.preview {
+         height: calc(100vh - 175px);
+         overflow-y: scroll;
+      }
       .menulist-wrapper {
+         background-color: white;
          margin-top: 100px;
          display: flex;
          flex-direction: column;
-         height: calc(100vh - 170px);
-         overflow-y: scroll;
-         padding: 0 20px 30px 20px;
+         padding: 0 20px 95px 20px;
          &::-webkit-scrollbar {
             width: 5px;
             background: rgba(0, 0, 0, 0);
@@ -161,6 +169,11 @@ export const Wrapper = styled.div`
                   background-color: lightgray;
                   margin-bottom: 10px;
                   overflow: hidden;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 15px;
+                  font-weight: 600;
                   img {
                      width: 100%;
                   }
@@ -174,6 +187,7 @@ export const Wrapper = styled.div`
                   h2 {
                      font-size: 14px;
                      font-weight: 600;
+                     word-break: keep-all;
                   }
                   span {
                      font-size: 10px;
@@ -181,6 +195,7 @@ export const Wrapper = styled.div`
                      padding: 2px;
                      border-radius: 3px;
                      background-color: #ffd6b8;
+                     word-break: keep-all;
                   }
                   p {
                      font-size: 12px;
@@ -198,6 +213,7 @@ export const Wrapper = styled.div`
          position: fixed;
          top: 50px;
          left: 50%;
+         z-index: 10;
          transform: translate(-50%);
          display: flex;
          .button {
@@ -243,6 +259,12 @@ export const Wrapper = styled.div`
          background-color: #ffd6b8;
          overflow: hidden;
          display: flex;
+         justify-content: center;
+         align-items: center;
+         font-size: 16px;
+         font-weight: 600;
+         text-align: center;
+         line-height: 20px;
          img {
             width: 100%;
          }
@@ -270,18 +292,22 @@ export const Wrapper = styled.div`
             word-break: keep-all;
          }
          .store-info {
-            padding: 5px;
+            padding: 10px;
             background-color: #ffefe3;
             border-radius: 3px;
+            min-height: 120px;
+            line-height: 22px;
          }
       }
    }
 
    .menu-container {
       margin-top: 95px;
-      height: calc(100vh - 170px);
+      /* min-height: calc(100vh - 95px); */
       display: flex;
       flex-direction: column;
+      position: relative;
+      margin-bottom: 120px;
       h1 {
          font-size: 14px;
          font-weight: 600;
@@ -291,7 +317,6 @@ export const Wrapper = styled.div`
          display: flex;
          flex-direction: column;
          flex: 1;
-         overflow-y: scroll;
          &::-webkit-scrollbar {
             width: 5px;
             background: rgba(0, 0, 0, 0);
@@ -317,6 +342,12 @@ export const Wrapper = styled.div`
                   background-color: lightgray;
                   margin-right: 10px;
                   overflow: hidden;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  font-size: 12px;
+                  font-weight: 600;
+                  text-align: center;
                   img {
                      width: 100%;
                   }
@@ -373,11 +404,24 @@ export const Wrapper = styled.div`
             }
          }
       }
+      .fixed {
+         background: white;
+         position: fixed;
+         bottom: 75px;
+         display: flex;
+         flex-direction: column;
+         width: 100%;
+         max-width: 500px;
+         box-shadow: 0px -2px 4px rgb(0 0 0 / 15%);
+      }
       .total-price {
          font-size: 20px;
          font-weight: 600;
          padding: 0 20px;
-         margin: 10px 0 20px;
+         margin: 15px 0 0px;
+         &.fixed {
+            padding: 10px 20px;
+         }
       }
       .order-btn {
          width: calc(100% - 40px);
@@ -385,7 +429,7 @@ export const Wrapper = styled.div`
          background-color: #ff6b00;
          color: white;
          border-radius: 10px;
-         margin: 0 20px 10px 20px;
+         margin: 15px 20px;
          font-size: 20px;
          font-weight: 600;
       }
@@ -436,6 +480,8 @@ export const DetailedWrapper = styled.section`
          h1 {
             font-size: 20px;
             color: #ff6b00;
+            word-break: keep-all;
+            font-weight: 600;
          }
          p {
             font-size: 16px;
@@ -443,6 +489,7 @@ export const DetailedWrapper = styled.section`
       }
       p {
          font-size: 14px;
+         word-break: keep-all;
       }
    }
    .cart {
@@ -522,7 +569,16 @@ export const BottomNavStyle = styled.div`
    transform: translate(-50%);
    box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.15);
    padding: 10px 20px;
+   transition: 0.2s;
+   &.hidden {
+      transform: translate(-50%, 100%);
+   }
 
+   .button.preview,
+   button.preview {
+      color: lightgray;
+      cursor: default;
+   }
    button,
    .button {
       width: 15%;
@@ -583,7 +639,13 @@ export const HeaderStyle = styled.header`
    z-index: 9999;
    transform: translate(-50%);
    box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.15);
-
+   .storeName {
+      height: 50px;
+      padding: 12px 0;
+      img {
+         height: 100%;
+      }
+   }
    @media screen and (max-width: 500px) {
       width: 100vw;
    }

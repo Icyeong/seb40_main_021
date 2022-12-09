@@ -1,3 +1,4 @@
+export const TOKEN = 'TOKEN';
 export const CLICK_TO_StoreInfoUpdate = 'CLICK_TO_StoreInfoUpdate';
 export const GNB_MOBILE = 'GNB_MOBILE';
 export const MENU_USER_UPDATE = 'MENU_USER_UPDATE';
@@ -17,7 +18,6 @@ export const GET_USER_POST_SUCCESS = 'GET_USER_POST_SUCCESS';
 export const CHANGE_INPUT = 'CHANGE_INPUT';
 export const CHANGE_NOW_INPUT = 'CHANGE_NOW_INPUT';
 export const DELETE_CATEGORY = 'DELETE_CATEGORY';
-export const QR_LIST_ALL_CHECK = 'QR_LIST_ALL_CHECK';
 export const PRINT_MODAL = 'PRINT_MODAL';
 export const CLEAR_SAVED_TABLE_LIST_CHECKBOX_ARR = 'CLEAR_SAVED_TABLE_LIST_CHECKBOX_ARR';
 export const MENU_VIEW_ITEM_ADD = 'MENU_VIEW_ITEM_ADD';
@@ -31,9 +31,19 @@ export const USER_MEMBER_PASSWORD = 'USER_MEMBER_PASSWORD';
 export const USER_MEMBER_BUSINESSNUMBER = 'USER_MEMBER_BUSINESSNUMBER';
 export const STORE_INFO_DATA = 'STORE_INFO_DATA';
 export const ALARMDATA_UPDATE = 'ALARMDATA_UPDATE';
-export const storeInfoUpdate = () => {
+export const UPDATE_PROGRESS = 'UPDATE_PROGRESS';
+export const SET_MENU_UPDATE = 'SET_MENU_UPDATE';
+export const IS_LOGIN = 'IS_LOGIN';
+export const DELETE_CATEGORY_RESTE_MENU = 'DELETE_CATEGORY_RESTE_MENU';
+export const DELETE_CATEGORY_RESTE_MENU_MENU = 'DELETE_CATEGORY_RESTE_MENU_MENU';
+export const GUIDE_MODAL = 'GUIDE_MODAL';
+
+export const storeInfoUpdate = chack => {
    return {
-      type: CLICK_TO_StoreInfoUpdate
+      type: CLICK_TO_StoreInfoUpdate,
+      payload: {
+         chack
+      }
    };
 };
 
@@ -193,14 +203,7 @@ export const clearSavedTableListCheckBoxArr = () => {
       type: CLEAR_SAVED_TABLE_LIST_CHECKBOX_ARR
    };
 };
-export const qrListAllCheck = chack => {
-   return {
-      type: QR_LIST_ALL_CHECK,
-      payload: {
-         chack
-      }
-   };
-};
+
 export const printModal = chack => {
    return {
       type: PRINT_MODAL,
@@ -275,15 +278,53 @@ export const onChangeBusinessNumberAction = res => {
       payload: res
    };
 };
-export const changStoreInfoData = data => {
+export const changeStoreInfoData = data => {
    return {
       type: STORE_INFO_DATA,
       payload: data
    };
 };
-export const updateAlarmData = (call, order) => {
+export const updateAlarmData = (orderAlarmReverse, callAlarmReverse) => {
    return {
       type: ALARMDATA_UPDATE,
-      payload: { call, order }
+      payload: { orderAlarmReverse, callAlarmReverse }
+   };
+};
+export const updateProgress = () => {
+   return {
+      type: UPDATE_PROGRESS
+   };
+};
+
+export const setMenuUpdate = res => {
+   return {
+      type: SET_MENU_UPDATE,
+      payload: res
+   };
+};
+
+export const setLoginStatus = res => {
+   return {
+      type: IS_LOGIN,
+      payload: res
+   };
+};
+
+export const deleteCategoryAndMenu = () => {
+   return {
+      type: DELETE_CATEGORY_RESTE_MENU
+   };
+};
+
+export const deleteCategoryAndMenumenu = () => {
+   return {
+      type: DELETE_CATEGORY_RESTE_MENU_MENU
+   };
+};
+
+export const setGuideModalState = res => {
+   return {
+      type: GUIDE_MODAL,
+      payload: res
    };
 };

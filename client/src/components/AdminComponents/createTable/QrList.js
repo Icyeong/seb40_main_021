@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import QrInfo from './QrInfo';
 import { useSelector } from 'react-redux';
 const QrList = () => {
-   const qrDatas = useSelector(state => state.adminReducer.qrDate);
-
+   let qrDatas = useSelector(state => state.adminReducer.qrDate);
+   if (!qrDatas) qrDatas = [];
    return (
       <QrListBox>
          {qrDatas.length === 0 ? (
@@ -31,11 +31,13 @@ const QrListBox = styled.div`
       align-items: center;
       font-weight: 900;
    }
-   ::-webkit-scrollbar {
-      width: 8px;
+   &::-webkit-scrollbar {
+      width: 10px;
+      background: rgba(0, 0, 0, 0);
    }
-   ::-webkit-scrollbar-thumb {
-      background: #a9a9a9;
+   &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 30px;
    }
    > :nth-child(even) {
       /* background-color: rgb(246, 246, 246); */

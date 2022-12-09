@@ -11,6 +11,7 @@ import MenuLi from './MenuLi';
 import * as S from './SetMenu.style';
 
 const Menu = () => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const categoryList = useSelector(store => store.categoryUserItemReducer.data);
    const [activeIndex, setActiveIndex] = useState(0);
 
@@ -20,7 +21,12 @@ const Menu = () => {
    let error;
    useEffect(() => {
       axios
-         .get(`category/${sessionStorage.getItem('userId')}`)
+         .get(`${API_BASE_URL}/category/${sessionStorage.getItem('userId')}`, {
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: sessionStorage.getItem('access token')
+            }
+         })
          .then(res => {
             dispatch(setGetUserCategory(res.data));
          })
@@ -33,8 +39,8 @@ const Menu = () => {
    };
    const viewPreview = useSelector(state => state.previewToggleReducer);
    return (
-      <S.SetMenuLayout>
-         {viewPreview ? <PreviewModal /> : null}
+      <S.SetMenuLayout className={viewPreview ? 'modalOpen' : null}>
+         {viewPreview ? <PreviewModal now={'menu'} /> : null}
          <S.Head>메뉴 목록</S.Head>
          <S.MenuLayout>
             <S.CategoryWrap className="editFalse">

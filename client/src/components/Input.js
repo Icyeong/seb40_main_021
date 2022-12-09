@@ -39,7 +39,7 @@ const InputBox = styled.input`
    ${props =>
       props.value === '' &&
       css`
-         border-bottom: 3px solid #ff6b00;
+         border-bottom: 2px solid #b6b6b6;
       `}
    ${p =>
       p.active &&
@@ -61,7 +61,12 @@ const InputBox = styled.input`
    }
 `;
 
-const Input = ({ type, name, handleValue, width, value, placeholder, idx, active }) => {
+const Input = ({ type, name, handleValue, width, value, placeholder, idx, active, isEmptyInputValue }) => {
+   const onChange = e => {
+      handleValue(e);
+      isEmptyInputValue && isEmptyInputValue(e, name);
+   };
+
    return (
       <InputBox
          type={type}
@@ -69,7 +74,7 @@ const Input = ({ type, name, handleValue, width, value, placeholder, idx, active
          active={active}
          value={value}
          //  defaultValue={value}
-         onChange={e => handleValue(e)}
+         onChange={onChange}
          width={width}
          placeholder={placeholder}
          name={name}

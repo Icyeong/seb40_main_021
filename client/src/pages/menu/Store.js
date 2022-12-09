@@ -8,23 +8,18 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 export const Store = () => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const store = useSelector(store => store.menuReducer.store);
    const dispatch = useDispatch();
    const userId = useParams().userId;
-   console.log(userId);
 
    // 가게 정보 불러오기
    useEffect(() => {
-      axios
-         .get(`/member/${userId}`)
-         // .get(`/member/1`)
-         .then(res => {
-            const storeInfo = res.data.data;
-            dispatch(setStoreInfo(storeInfo));
-         })
-         .catch(err => console.log(err));
+      axios.get(`${API_BASE_URL}/member/${userId}`).then(res => {
+         const storeInfo = res.data.data;
+         dispatch(setStoreInfo(storeInfo));
+      });
    }, []);
-
    return (
       <Wrapper>
          <motion.main
@@ -38,7 +33,15 @@ export const Store = () => {
             }}>
             <section className="store-wrapper">
                <div className="store-imgBox">
-                  <img src={store.img} alt="가게" />
+                  {store.userImage === null ? (
+                     <p>
+                        이미지
+                        <br />
+                        준비중입니다
+                     </p>
+                  ) : (
+                     <img src={store.userImage} alt="가게" />
+                  )}
                </div>
                <h1>{store.businessName}</h1>
                <ul>

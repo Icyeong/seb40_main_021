@@ -1,39 +1,56 @@
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeInfoUpdate } from '../../../redux/action/action';
-const ButtonWrap = ({ bottom, isEmptyValue }) => {
+import { previewToggleState, storeInfoUpdate } from '../../../redux/action/action';
+import axios from 'axios';
+import { useEffect } from 'react';
+const ButtonWrap = ({ bottom, isEmptyValue, setUserInfo }) => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const dispatch = useDispatch();
-   const url = useSelector(state => state.adminReducer.apiUrl);
    const UpdateState = useSelector(state => state.adminReducer.storeInfoUpdateState);
    const storeInfoData = useSelector(state => state.adminReducer.storeInfoData);
-   console.log(isEmptyValue);
+   useEffect(() => {
+      dispatch(storeInfoUpdate(false));
+      axios.get(`${API_BASE_URL}/member/${sessionStorage.getItem('userId')}`).then(res => {
+         setUserInfo(res.data.data);
+      });
+   }, []);
    const handleClickInfoUpdate = () => {
-      if (!UpdateState) dispatch(storeInfoUpdate());
+      if (!UpdateState) dispatch(storeInfoUpdate(true));
       if (UpdateState && isEmptyValue) {
-         alert('전송');
-         dispatch(storeInfoUpdate());
+         alert('수정이 완료되었습니다.');
+         dispatch(storeInfoUpdate(false));
          const body = {
             businessName: storeInfoData.businessName,
+            address: storeInfoData.address,
             businessNumber: storeInfoData.businessNum,
             contactNumber: storeInfoData.number,
-            about: storeInfoData.description
+            businessHours: storeInfoData.businessHours,
+            about: storeInfoData.description,
+            userImage: storeInfoData.userImage
          };
-         fetch(`${url}/member/${sessionStorage.getItem('userId')}`, {
+         fetch(`${API_BASE_URL}/member/${sessionStorage.getItem('userId')}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', Authorization: sessionStorage.getItem('Authorization') },
             body: JSON.stringify(body)
          })
-            .then(res => {
-               console.log(res);
+            .then(() => {
+               axios.get(`${API_BASE_URL}/member/${sessionStorage.getItem('userId')}`).then(res => {
+                  setUserInfo(res.data.data);
+               });
             })
-            .catch(err => console.log(err));
+            .catch(err => err);
       } else if (UpdateState && !isEmptyValue) {
          alert('모든 칸을 채워주세요');
       }
    };
+
+   const viewPreview = useSelector(state => state.previewToggleReducer);
+   const PreviewFunc = () => {
+      dispatch(previewToggleState(!viewPreview));
+   };
    return (
       <BtnWrap bottom={bottom}>
-         <WhiteBtn>미리보기</WhiteBtn>
+         <WhiteBtn onClick={PreviewFunc}>미리보기</WhiteBtn>
          <OrangeBtn onClick={handleClickInfoUpdate}>{UpdateState ? '확인' : '가게정보 수정'}</OrangeBtn>
       </BtnWrap>
    );
@@ -45,7 +62,8 @@ const BtnWrap = styled.div`
    width: 100%;
    justify-content: end;
    margin: 20px 10px 0 0;
-   @media screen and (max-width: 700px) {
+
+   @media screen and (max-width: 900px) {
       background-color: white;
       margin: 0;
       width: 100%;
@@ -67,8 +85,9 @@ export const WhiteBtn = styled.button`
    &:hover {
       background-color: #313e46;
    }
-   @media screen and (max-width: 700px) {
-      display: none;
+   @media screen and (max-width: 900px) {
+      width: 50%;
+      /* display: none; */
    }
 `;
 const OrangeBtn = styled.button`
@@ -76,6 +95,7 @@ const OrangeBtn = styled.button`
    height: 47px;
    align-items: center;
    padding: 12px 0px;
+
    /* border: 2px solid #ff6c01; */
    cursor: pointer;
    color: white;
@@ -88,7 +108,7 @@ const OrangeBtn = styled.button`
    &:hover {
       background-color: #313e46;
    }
-   @media screen and (max-width: 700px) {
-      width: 100%;
+   @media screen and (max-width: 900px) {
+      width: 50%;
    }
 `;

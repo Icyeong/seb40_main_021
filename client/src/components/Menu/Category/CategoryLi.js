@@ -4,6 +4,9 @@ import IconDelete from './../../../assets/img/icon_delete.png';
 import * as S from './CategoryLi.style';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+   deleteCategoryAndMenu,
+   deleteCategoryAndMenumenu,
+   setMenuUpdate,
    setUserCategoryNaming,
    setUserCategoryNowNaming,
    setUserDeleteCategory,
@@ -11,7 +14,8 @@ import {
 } from '../../../redux/action/action';
 import { useAxios } from '../../../util/useAxios';
 
-const CategoryLi = ({ placeholder, edit, el, active, idx, setActiveIndex, userId }) => {
+const CategoryLi = ({ placeholder, edit, el, active, idx, setActiveIndex, setIsalertFloat }) => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const { categoryId, categoryName } = el;
 
    const state = useSelector(store => store.categoryUserItemReducer);
@@ -39,8 +43,12 @@ const CategoryLi = ({ placeholder, edit, el, active, idx, setActiveIndex, userId
             dispatch(setUserCategoryNaming(''));
             clickFetchFunc({
                method: 'PATCH',
-               url: `/category/update/${userId}`,
-               data: { categoryName: categoryAddName }
+               url: `${API_BASE_URL}/category/update/${categoryId}`,
+               data: { categoryName: categoryAddName },
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: sessionStorage.getItem('access token')
+               }
             });
             setTogglePatchCategory(!togglePatchCategory);
          }
@@ -76,17 +84,32 @@ const CategoryLi = ({ placeholder, edit, el, active, idx, setActiveIndex, userId
          }
          clickFetchFunc({
             method: 'DELETE',
-            url: `/category/${categoryId}`
+            url: `${API_BASE_URL}/category/${categoryId}`,
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: sessionStorage.getItem('access token')
+            }
          });
+         setIsalertFloat(true);
+
+         if (state.data.length === 1) {
+            dispatch(deleteCategoryAndMenu());
+            dispatch(deleteCategoryAndMenumenu());
+         }
          return dispatch(setUserDeleteCategory(idx));
       }
-
-      // if (length === 1) {
-      //    return alert('마지막 카테고리는 삭제가 불가능합니다.');
-      // }
    };
+   const setmenuChangeState = useSelector(store => store.setmenuStateChangeReducer);
    const onTitleClick = () => {
-      setActiveIndex(idx);
+      if (setmenuChangeState) {
+         if (confirm('저장하지 않은 메뉴가 사라질 수 있습니다. 카테고리를 변경하시겠습니까?')) {
+            setActiveIndex(idx);
+            dispatch(setMenuUpdate(false));
+         }
+      } else {
+         setActiveIndex(idx);
+         dispatch(setMenuUpdate(false));
+      }
    };
    return (
       <S.CategoryLiSTyle active={active} onClick={onTitleClick}>

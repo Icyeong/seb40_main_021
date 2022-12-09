@@ -35,13 +35,13 @@ export const OrderListBox = styled.div`
          font-weight: 400;
       }
    }
-   @media screen and (max-width: 700px) {
+   @media screen and (max-width: 900px) {
       .orderList {
          display: flex;
          align-items: center;
          height: 70px;
          font-weight: bold;
-
+         font-size: 14px;
          > :first-child {
             margin-left: 20px;
             width: 40%;
@@ -57,7 +57,6 @@ export const OrderListBox = styled.div`
 `;
 export const Order = styled.div`
    cursor: pointer;
-   /* border: ${({ menuViewDetails }) => (menuViewDetails ? '3px solid rgb(255, 107, 0)' : 'none')}; */
    box-shadow: 0 2px 10px 2px rgb(0 0 0 / 15%);
    border-radius: 3px;
    width: auto;
@@ -65,6 +64,7 @@ export const Order = styled.div`
    font-size: 20px;
    margin-bottom: 15px;
    background-color: white;
+   padding-top: 5px;
    .reqText {
       display: flex;
       align-items: center;
@@ -91,66 +91,69 @@ export const Order = styled.div`
       display: flex;
       align-items: center;
       font-weight: 900;
+
+      .detailedMenuIcon {
+         margin-right: 10px;
+      }
       > :first-child {
+         width: 15%;
          font-size: 30px;
          margin-left: 45px;
          margin-right: 100px;
          color: #ff6c01;
       }
-      > div > b {
-         font-size: 24px;
+      .orderMenu {
+         width: 20%;
       }
-      &:hover {
+      .orderTime {
+         width: 20%;
+         font-size: 14px;
+         margin-left: 30px;
+         text-align: center;
+      }
+      .deleteBtn {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         width: 20%;
+         height: fit-content;
+         > :first-child {
+            margin-right: 5px;
+            margin-bottom: 2px;
+         }
+      }
+      /* &:hover {
          background-color: #fdffde;
-      }
+      } */
    }
-   #orderTime {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      margin-left: 100px;
-      > :first-child {
-         font-weight: bold;
-         margin-right: 9px;
-      }
-   }
+
    .reqText {
       padding-left: 40px;
    }
-   @media screen and (max-width: 700px) {
+   @media screen and (max-width: 900px) {
       font-size: 16px;
-      .detailedMenuIcon {
-         margin-right: 10px;
-      }
+      font-weight: bold;
+
       #oderInfo {
+         font-size: 12px;
          > :first-child {
+            font-size: 24px;
             margin: 0;
-            width: 15%;
-            font-size: 1.2rem;
+            width: 25%;
             margin-left: 20px;
          }
          > :nth-child(2) {
-            font-size: 1rem;
             text-align: center;
-            width: 20%;
-            b {
-               font-size: 1.1rem;
-            }
+            width: 25%;
          }
-      }
-      .reqText {
-         padding-left: 20px;
-      }
-      #orderTime {
-         flex-grow: 0;
-         font-size: 0.8rem;
-
-         margin-left: 10px;
-
-         margin-right: 10px;
-         > :first-child {
-            text-align: right;
-            margin-right: 25px;
+         #orderTime {
+            text-align: center;
+            font-size: 10px;
+            margin-left: 0px;
+            > :first-child {
+               font-weight: bold;
+               margin-right: 9px;
+            }
          }
       }
    }

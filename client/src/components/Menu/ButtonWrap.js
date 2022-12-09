@@ -16,7 +16,8 @@ const BtnWrap = styled.div`
       box-sizing: border-box;
       padding: 20px 15px;
       width: 100%;
-      bottom: -87px;
+      bottom: 0px;
+      margin: 0;
       position: fixed;
       right: 0;
       transform: translate(0);
@@ -68,9 +69,10 @@ const BtnWrap = styled.div`
 // `;
 const ButtonWrap = ({ name, save }) => {
    const dispatch = useDispatch();
+   const categoryList = useSelector(store => store.categoryUserItemReducer.data);
    const viewPreview = useSelector(state => state.previewToggleReducer);
    const PreviewFunc = () => {
-      dispatch(previewToggleState(!viewPreview));
+      categoryList.length === 0 ? alert('카테고리를 1개이상 등록해주세요') : dispatch(previewToggleState(!viewPreview));
    };
    return (
       <BtnWrap>

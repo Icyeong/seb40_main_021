@@ -1,31 +1,28 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { OrderedItem } from '../../components/usermenu/OrderedItem';
 import { orderedList } from '../../redux/actions/menuAction';
 
 export const OrderedList = () => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const dispatch = useDispatch();
-   const [total, setTotal] = useState(0);
+   // const [total, setTotal] = useState(0);
    const ordered = useSelector(store => store.menuReducer.ordered);
-   let temp = 0;
+   const priceArr = ordered.map(menu => menu.price * menu.quantity);
+   const totalPrice = priceArr.reduce((prev, cur) => prev + cur, 0);
    const userId = useParams().userId;
    const tableNumber = useParams().tableNumber;
-   console.log(userId, tableNumber);
-
    useEffect(() => {
       // 주문목록 불러오기
       axios
-         .get(`/order/${userId}/${tableNumber}`)
-         // .get(`/order/1/1`)
+         .get(`${API_BASE_URL}/order/${userId}/${tableNumber}`)
          .then(res => {
             const data = res.data.data;
             dispatch(orderedList(data));
-            ordered.map(menu => (temp += menu.price * menu.quantity));
-            setTotal(temp);
          })
-         .catch(err => console.log(err));
+         .catch(err => err);
    }, []);
 
    return (
@@ -36,7 +33,9 @@ export const OrderedList = () => {
                <OrderedItem key={menu.menuId} data={menu} />
             ))}
          </ul>
-         <p className="total-price">총 주문 금액 : {total}원</p>
+         <p className="total-price fixed">
+            총 주문 금액 : {totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}원
+         </p>
       </div>
    );
 };

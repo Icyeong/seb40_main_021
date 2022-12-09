@@ -6,6 +6,7 @@ import * as S from './CategoryLi.style';
 import axios from 'axios';
 
 const CategoryAdd = ({ placeholder, active, setToggleCategoryAdd, userId }) => {
+   const API_BASE_URL = process.env.REACT_APP_API_ROOT;
    const dispatch = useDispatch();
    const state = useSelector(store => store.categoryUserItemReducer);
    const { categoryName } = state.input;
@@ -14,9 +15,6 @@ const CategoryAdd = ({ placeholder, active, setToggleCategoryAdd, userId }) => {
       const value = e.target.value;
       dispatch(setUserCategoryNaming(value));
    };
-   //post
-   // const { response, clickFetchFunc } = useAxios({}, false);
-   // response && console.log(response);
    const CategoryNameSave = () => {
       if (!categoryName || !categoryName.trim()) {
          return alert('카테고리 이름을 작성하세요.');
@@ -31,10 +29,14 @@ const CategoryAdd = ({ placeholder, active, setToggleCategoryAdd, userId }) => {
       // });
       axios({
          method: 'POST',
-         url: `category/write`,
+         url: `${API_BASE_URL}/category/write`,
          data: {
             memberId: userId,
             categoryName: categoryName
+         },
+         headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('access token')
          }
       }).then(res => {
          dispatch(

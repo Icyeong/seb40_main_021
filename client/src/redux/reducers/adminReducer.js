@@ -6,19 +6,18 @@ import {
    SET_SEVED_TABLE_NUM,
    MODIFYING_SAVED_TABLE_NUM,
    SAVED_TABLE_LIST_CHECKBOX_ARR,
-   QR_LIST_ALL_CHECK,
    PRINT_MODAL,
    CLEAR_SAVED_TABLE_LIST_CHECKBOX_ARR,
    UPDATE_TABLE_NUMBER,
    REGIST_UPDATE_TABLE_NUMBER,
    GET_QR_DATA,
    STORE_INFO_DATA,
-   ALARMDATA_UPDATE
+   ALARMDATA_UPDATE,
+   UPDATE_PROGRESS
 } from '../action/action';
 const adminState = {
-   apiUrl: 'https://d033-221-140-177-247.jp.ngrok.io',
    printModal: false,
-   qrListAllCheck: false,
+   qrListAllCheck: true,
    storeInfoUpdateState: false,
    qrDate: [],
    savedTableListCheckBoxArr: [],
@@ -33,16 +32,14 @@ const adminState = {
 export const adminReducer = (state = adminState, action) => {
    switch (action.type) {
       case CLICK_TO_StoreInfoUpdate:
-         // eslint-disable-next-line no-case-declarations
-         const currenStoreInfoUpdateState = state.storeInfoUpdateState;
-         return Object.assign({}, state, { storeInfoUpdateState: !currenStoreInfoUpdateState });
+         return Object.assign({}, state, { storeInfoUpdateState: action.payload.chack });
 
       case CREATE_QR:
          return Object.assign({}, state, { qrDate: action.payload.QrList });
 
       case REGISTER_TABLE_NUM:
          // eslint-disable-next-line no-case-declarations
-         const url = 'http://qr-order.s3-website.ap-northeast-2.amazonaws.com';
+         const url = `${window.location.protocol}//${window.location.host}`;
          state.qrDate[action.payload.idx].tableNumber = action.payload.tableNum;
          state.qrDate[
             action.payload.idx
@@ -73,8 +70,6 @@ export const adminReducer = (state = adminState, action) => {
          }
          return Object.assign({}, state, { savedTableListCheckBoxArr: newSavedTableListCheckBoxArr });
 
-      case QR_LIST_ALL_CHECK:
-         return Object.assign({}, state, { qrListAllCheck: action.payload.chack });
       case PRINT_MODAL:
          return Object.assign({}, state, { printModal: action.payload.chack });
       case CLEAR_SAVED_TABLE_LIST_CHECKBOX_ARR:
@@ -85,10 +80,11 @@ export const adminReducer = (state = adminState, action) => {
 
          for (let i = 0; i < state.savedTableListCheckBoxArr.length; i++) {
             const body = { idx: state.savedTableListCheckBoxArr[i], newTableNum: null };
-            // const body = { idx: action.payload.idx, newTableNum: action.payload.newNum };
             newArr.push(body);
          }
          return Object.assign({}, state, { updateTableNumber: newArr });
+      case UPDATE_PROGRESS:
+         return Object.assign({}, state, { updateTableNumber: [] });
       case REGIST_UPDATE_TABLE_NUMBER:
          // eslint-disable-next-line no-case-declarations
          const newUpateArr = state.updateTableNumber;
@@ -98,14 +94,13 @@ export const adminReducer = (state = adminState, action) => {
             }
          });
          // newUpateArr[action.payload.idx].newTableNum = action.payload.num;
-         console.log(newUpateArr);
          return Object.assign({}, state, { updateTableNumber: newUpateArr });
       case GET_QR_DATA:
          return Object.assign({}, state, { qrDate: action.payload.data });
       case STORE_INFO_DATA:
          return Object.assign({}, state, { storeInfoData: action.payload });
       case ALARMDATA_UPDATE:
-         return Object.assign({}, state, { storeInfoData: action.payload });
+         return Object.assign({}, state, { alarmData: action.payload });
       default:
          return state;
    }

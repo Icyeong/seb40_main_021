@@ -1,4 +1,4 @@
-import { MENU_VIEW_ITEM_ADD } from '../action/action';
+import { MENU_VIEW_ITEM_ADD, DELETE_CATEGORY_RESTE_MENU_MENU } from '../action/action';
 
 const initialState = {
    data: []
@@ -11,6 +11,9 @@ const menuSaveItemReducer = (state = initialState, action) => {
          const dataSet = action.payload.res.data;
          state.data = dataSet;
          return state;
+      case DELETE_CATEGORY_RESTE_MENU_MENU:
+         state.data = [];
+         return Object.assign({}, state);
       default:
          return state;
    }
