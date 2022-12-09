@@ -41,6 +41,7 @@ const QrInfo = ({ data, idx, length, allChackBoxRef }) => {
          <div className="qrInfos">
             <div>
                <input
+                  className="hidden-input"
                   id={`check-input${idx}`}
                   disabled={modifyingSavedTableNumState ? true : false}
                   ref={checkBoxRef}
@@ -76,7 +77,7 @@ const QrInfoBox = styled.div`
    .created-date {
       font-size: 16px;
    }
-   input {
+   .hidden-input {
       display: none;
    }
    input:checked + label::after {
